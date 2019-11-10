@@ -20,18 +20,16 @@
 
 (define (to-numeral n)
   (if (= n 0)
-      (lambda (f v) v)
+      zero
       (succ (to-numeral (- n 1)))))
 
 (define (plus n m)
-  (lambda (f v) ((n succ m) f v)))
+  (n succ m))
 
 
 (define (mult n m)
-  (lambda (f v) ((n
-                  (lambda (numeral) (plus m numeral))
-                  zero)
-                 f v)))
+  (n (lambda (numeral) (plus m numeral))
+     zero))
 
 (define (pred n)
   (lambda (f v) ((n
