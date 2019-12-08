@@ -18,23 +18,15 @@
 
 ; 00.
 (define (all? p? xs)
-  (if (null? xs)
-      true
-      (and (p? (car xs)) (all? p? (cdr xs)))))
+  (foldr (lambda (x y) (and x y)) true (map p? xs)))
 
 ; 01.
 (define (any? p? xs)
-    (if (null? xs)
-      false
-      (or (p? (car xs)) (any? p? (cdr xs)))))
+  (not (all? (lambda (x) (not (p? x))) xs)))
 
 ; 02.
 (define (concat xss)
-  (if (null? xss)
-      '()
-      (if (null? (car xss))
-          (concat (cdr xss))
-          (cons (caar xss) (concat (append (list (cdar xss)) (cdr xss)))))))
+  (foldr append '() xss))
 
 ; 03.
 (define (rows xss) xss)
@@ -47,9 +39,7 @@
 
 ; 05.
 (define (matrix-ref xss i j)
-  (if (= i 0)
-      (list-ref (car xss) j)
-      (matrix-ref (cdr xss) (- i 1) j)))
+  (list-ref (list-ref xss i) j))
 
 ; 06.
 (define (set xs i x)
@@ -61,9 +51,7 @@
 
 ; 07.
 (define (place xss i j x)
-  (if (= i 0)
-      (cons (set (car xss) j x) (cdr xss))
-      (cons (car xss) (place (cdr xss) (- i 1) j x))))
+  (set xss i (set (list-ref xss i) j x)))
 
 ; 08.
 (define (diag xss)
@@ -80,15 +68,11 @@
 
 ; 10.
 (define (map-matrix f xss)
-  (if (null? xss)
-      '()
-      (cons (map f (car xss)) (map-matrix f (cdr xss)))))
+  (map (lambda (xs) (map f xs)) xss))
 
 ; 11.
 (define (filter-matrix p? xss)
-    (if (null? xss)
-      '()
-      (cons (filter p? (car xss)) (filter-matrix p? (cdr xss)))))
+  (map (lambda (xs) (filter p? xs)) xss))
 
 ; 12.
 (define (zip-with f xs ys)
@@ -98,6 +82,4 @@
 
 ; 13.
 (define (zip-matrix xss yss)
-  (if (or (null? xss) (null? yss))
-      '()
-      (cons (zip-with cons (car xss) (car yss)) (zip-matrix (cdr xss) (cdr yss)))))
+  (map (lambda (xs ys) (zip-with cons xs ys)) xss yss))

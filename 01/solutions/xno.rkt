@@ -100,7 +100,7 @@
       xs2))
 
 
-; these funcs are meant to be used on a bard->free-place assoc array's element
+; these funcs are meant to be used on a board->free-place assoc array's element
 (define (apply-max-alg xs)
   (cons (max-alg (car xs)) (cdr xs)))
 
