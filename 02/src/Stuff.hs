@@ -21,8 +21,7 @@ insertBy f a l@(x:xs)
   | otherwise = a : l
 
 sortBy :: (a -> a -> Ordering) -> [a] -> [a]
-sortBy _ [] = []
-sortBy f (x:xs) = insertBy f x $ sortBy f xs
+sortBy f = foldr (insertBy f) []
 
 groupBy :: (a -> a -> Bool) -> [a] -> [[a]]
 groupBy _ [] = []
@@ -35,10 +34,16 @@ on f g a b = f (g a) (g b)
 (&&&) f g a = (f a, g a)
 
 sortOn :: Ord b => (a -> b) -> [a] -> [a]
-sortOn f = map fst . sortBy (on compare snd) . map (id &&& f)
+sortOn f
+  = map fst
+  . sortBy (compare `on` snd)
+  . map (id &&& f)
 
 groupOn :: Eq b => (a -> b) -> [a] -> [[a]]
-groupOn f = map (map fst) . groupBy (on (==) snd) . map (id &&& f)
+groupOn f
+  = map (map fst)
+  . groupBy ((==) `on` snd)
+  . map (id &&& f)
 
 classifyOn :: Ord b => (a -> b) -> [a] -> [[a]]
-classifyOn f = groupOn f . sortOn f -- Can I get rid of f somehow here?
+classifyOn f = groupOn f . sortOn f

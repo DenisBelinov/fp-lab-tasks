@@ -28,4 +28,4 @@ groupOnNonEmpty :: Eq b => (a -> b) -> [a] -> [NonEmpty a]
 groupOnNonEmpty f =  map (mapNonEmpty fst) . groupByNonEmpty (on (==) snd) . map (id &&& f)
 
 classifyOnNonEmpty :: Ord b => (a -> b) -> [a] -> [NonEmpty a]
-classifyOnNonEmpty f xs = groupOnNonEmpty f $ sortOn f xs
+classifyOnNonEmpty f = groupOnNonEmpty f . sortOn f
