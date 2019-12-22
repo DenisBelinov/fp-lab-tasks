@@ -10,29 +10,35 @@ module Stuff
   ) where
 
 group :: Eq a => [a] -> [[a]]
-group = undefined
+group [] = []
+group l@(x:_) = takeWhile (==x) l : group (dropWhile (==x) l)
 
 -- Not mandatory, delete if you don't want this.
 insertBy :: (a -> a -> Ordering) -> a -> [a] -> [a]
-insertBy = undefined
+insertBy _ a [] = [a]
+insertBy f a l@(x:xs)
+  | f a x == GT = x : insertBy f a xs
+  | otherwise = a : l
 
 sortBy :: (a -> a -> Ordering) -> [a] -> [a]
-sortBy = undefined
+sortBy _ [] = []
+sortBy f (x:xs) = insertBy f x $ sortBy f xs
 
 groupBy :: (a -> a -> Bool) -> [a] -> [[a]]
-groupBy = undefined
+groupBy _ [] = []
+groupBy f l@(x:_) = takeWhile (f x) l : groupBy f (dropWhile (f x) l)
 
 on :: (b -> b -> c) -> (a -> b) -> a -> a -> c
-on = undefined
+on f g a b = f (g a) (g b)
 
 (&&&) :: (a -> b) -> (a -> c) -> a -> (b, c)
-(&&&) = undefined
+(&&&) f g a = (f a, g a)
 
 sortOn :: Ord b => (a -> b) -> [a] -> [a]
-sortOn = undefined
+sortOn f = map fst . sortBy (on compare snd) . map (id &&& f)
 
 groupOn :: Eq b => (a -> b) -> [a] -> [[a]]
-groupOn = undefined
+groupOn f = map (map fst) . groupBy (on (==) snd) . map (id &&& f)
 
 classifyOn :: Ord b => (a -> b) -> [a] -> [[a]]
-classifyOn = undefined
+classifyOn f = groupOn f . sortOn f -- Can I get rid of f somehow here?
