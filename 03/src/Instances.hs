@@ -15,7 +15,7 @@ newtype Pointwise a b = Pointwise {getPointwise :: (a, b)}
 
 instance (Ord a, Ord b) => Ord (Pointwise a b) where
   (<=) :: Pointwise a b -> Pointwise a b -> Bool
-  (Pointwise (a, b)) <= (Pointwise (a', b')) = a <= a' &&  b <= b'
+  Pointwise (a, b) <= Pointwise (a', b') = a <= a' &&  b <= b'
 
 newtype Lexicographic a b = Lexicographic {getLexicographic :: (a, b)}
   deriving (Show, Eq)
@@ -29,7 +29,7 @@ newtype Fun a b = Fun {getFun :: a -> b}
 
 instance (Semigroup b) => Semigroup (Fun a b) where
   (<>) :: Fun a b -> Fun a b -> Fun a b
-  (Fun f1) <> (Fun f2) = Fun (liftA2 (<>) f1 f2)
+  (<>) = (Fun .) . (liftA2 (<>) `on` getFun)
 
 instance (Monoid b) => Monoid (Fun a b) where
   mempty :: Fun a b
@@ -85,7 +85,7 @@ instance Monoid a => Monoid (Dual a) where
 reverse :: [a] -> [a]
 --reverse' = getDual . foldr (<>) (Dual []) . map (\x -> Dual [x])
 --reverse' = getDual . foldr ((<>) . (\ x -> Dual [x])) (Dual [])
-reverse = getDual . foldMap (\ x -> Dual [x])
+reverse = getDual . foldMap (Dual . (:[]))
 
 data Flux a = Flux
   { sides :: Maybe (a, a)

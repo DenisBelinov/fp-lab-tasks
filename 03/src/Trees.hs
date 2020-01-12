@@ -18,9 +18,8 @@ data Tree a
 instance Eq a => Eq (Tree a) where
   (==) :: Tree a -> Tree a -> Bool
   Empty == Empty = True
-  _ == Empty = False
-  Empty == _ = False
   (Node x t1 t2) == (Node x' t1' t2') = (x == x') && (t1 == t1') && (t2 == t2')
+  _ == _ = False
 
 insertOrdered :: Ord a => a -> Tree a -> Tree a
 insertOrdered x Empty = Node x Empty Empty
@@ -40,13 +39,11 @@ data BotTop a = Bot | Val a | Top
 
 between :: Ord a => BotTop a -> BotTop a -> Tree a -> Bool
 between a b Empty = a <= b
-between a b (Node x lt rt) = a < Val x && b >= Val x && between a (Val x) lt && between (Val x) b rt
+between a b (Node x lt rt) = between a (Val x) lt && between (Val x) b rt
 
 findBST :: Ord a => a -> Tree a -> Bool
 findBST _ Empty = False
-findBST a (Node x lt rt)
-  | x == a = True
-  | otherwise = findBST a lt || findBST a rt
+findBST a (Node x lt rt) = x == a || findBST a lt || findBST a rt
 
 mapTree :: (a -> b) -> Tree a -> Tree b
 mapTree _ Empty = Empty
@@ -86,10 +83,10 @@ ifJust (Just x) f = f x
 
 validateTree :: (a -> Maybe b) -> Tree a -> Maybe (Tree b)
 validateTree _ Empty = Just Empty
-validateTree f (Node v lt rt) = ifJust (validateTree f lt)
-                                       (\x -> ifJust (f v)
-                                                     (\y -> ifJust (validateTree f rt)
-                                                                   (Just . Node y x)))
+validateTree f (Node v lt rt) =
+  validateTree f lt `ifJust` (\lt' ->
+  f v               `ifJust` (\v' ->
+  validateTree f rt `ifJust` (Just . Node v' lt')))
 
 data Direction
   = L -- go left
